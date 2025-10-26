@@ -3,9 +3,6 @@ import HitmanModel from './components/HitmanModel'
 
 function App() {
   const [isLoaded, setIsLoaded] = useState(false)
-  const [scanCount, setScanCount] = useState(0)
-  const [showTarget, setShowTarget] = useState(false)
-  const [missionPhase, setMissionPhase] = useState('RECONNAISSANCE')
   const [heartRate, setHeartRate] = useState(85)
   const [heartRateHistory, setHeartRateHistory] = useState([85, 87, 83, 89, 85])
   const [bloodPressure, setBloodPressure] = useState('120/80')
@@ -16,9 +13,6 @@ function App() {
 
   useEffect(() => {
     setIsLoaded(true)
-    // Simulate scan count from localStorage
-    const savedScans = localStorage.getItem('hitman-scans') || '0'
-    setScanCount(parseInt(savedScans))
     
     // Set mission status based on day/time
     const updateMissionStatus = () => {
@@ -27,22 +21,16 @@ function App() {
       const hour = now.getHours()
       
       if (dayOfWeek === 5) { // Friday
-        setMissionPhase('RECONNAISSANCE')
         setMissionStatus('RECONNAISSANCE')
       } else if (dayOfWeek === 6 && hour >= 18) { // Saturday after 6 PM
-        setMissionPhase('BARTENDING')
         setMissionStatus('BARTENDING')
       } else if (dayOfWeek === 6 && hour < 18) { // Saturday before 6 PM
-        setMissionPhase('PREPARATION')
         setMissionStatus('PREPARATION')
       } else if (dayOfWeek === 0) { // Sunday
-        setMissionPhase('DEBRIEFING')
         setMissionStatus('DEBRIEFING')
       } else if (dayOfWeek >= 1 && dayOfWeek <= 4) { // Monday-Thursday
-        setMissionPhase('TRAINING')
         setMissionStatus('TRAINING')
       } else {
-        setMissionPhase('STANDBY')
         setMissionStatus('STANDBY')
       }
     }
@@ -96,7 +84,7 @@ function App() {
       <div className="absolute inset-0 bg-gradient-to-br from-red-900/10 via-black to-red-900/5"></div>
       
       {/* Target Crosshair Overlay */}
-      {showTarget && (
+      {false && (
         <div className="absolute inset-0 pointer-events-none z-20">
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
             <div className="w-32 h-32 border-2 border-red-500 rounded-full animate-ping">
