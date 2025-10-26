@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react'
 import HitmanModel from './components/HitmanModel'
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadingProgress, setLoadingProgress] = useState(0)
+  const [currentStep, setCurrentStep] = useState(0)
   const [heartRate, setHeartRate] = useState(85)
   const [heartRateHistory, setHeartRateHistory] = useState([85, 87, 83, 89, 85])
   const [bloodPressure, setBloodPressure] = useState('120/80')
@@ -11,6 +14,36 @@ function App() {
   const [missionStatus, setMissionStatus] = useState('')
 
   useEffect(() => {
+    // Simulate loading time for government system initialization
+    const loadingSteps = [
+      'ESTABLISHING SECURE CHANNEL',
+      'LOADING AGENT DATABASE', 
+      'INITIALIZING VITAL MONITORS',
+      'ESTABLISHING QR TRACKING',
+      'FINALIZING SYSTEM ACCESS'
+    ]
+    
+    let progress = 0
+    let step = 0
+    
+    const progressInterval = setInterval(() => {
+      progress += Math.random() * 8 + 3 // Slower progress increments for 5 seconds
+      if (progress >= 100) {
+        progress = 100
+        clearInterval(progressInterval)
+        setTimeout(() => setIsLoading(false), 500)
+      }
+      
+      // Update step based on progress
+      const newStep = Math.floor((progress / 100) * loadingSteps.length)
+      if (newStep !== step) {
+        step = newStep
+        setCurrentStep(step)
+      }
+      
+      setLoadingProgress(Math.min(progress, 100))
+    }, 150)
+    
     // Set mission status based on day/time
     const updateMissionStatus = () => {
       const now = new Date()
@@ -70,6 +103,7 @@ function App() {
     }, 3000) // Update every 3 seconds
     
     return () => {
+      clearInterval(progressInterval)
       clearInterval(statusInterval)
       clearInterval(vitalSignsInterval)
     }
@@ -77,6 +111,92 @@ function App() {
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
+      {/* Government Loading Overlay */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+          <div className="bg-black/90 border border-green-500/50 rounded-lg p-8 max-w-md w-full mx-4">
+            {/* Government Header */}
+            <div className="text-center mb-6">
+              <div className="text-green-400 text-lg font-mono font-bold mb-2 animate-pulse">
+                CLASSIFIED GOVERNMENT SYSTEM
+              </div>
+              <div className="text-green-500 text-sm font-mono">
+                INITIALIZING SECURE CONNECTION...
+              </div>
+              <div className="text-gray-400 text-xs font-mono mt-1">
+                {new Date().toLocaleString()}
+              </div>
+            </div>
+            
+            {/* Loading Progress */}
+            <div className="mb-6">
+              <div className="flex justify-between text-xs text-green-400 font-mono mb-2">
+                <span>SYSTEM STATUS</span>
+                <span className="animate-pulse">{Math.round(loadingProgress)}%</span>
+              </div>
+              <div className="w-full bg-black border border-green-500/30 rounded-full h-3 overflow-hidden">
+                <div 
+                  className="bg-gradient-to-r from-green-500 to-green-400 h-3 rounded-full transition-all duration-300 ease-out"
+                  style={{width: `${loadingProgress}%`}}
+                ></div>
+              </div>
+              <div className="text-center text-xs text-green-400 font-mono mt-1">
+                {loadingProgress < 100 ? 'INITIALIZING...' : 'ACCESS GRANTED'}
+              </div>
+            </div>
+            
+            {/* Loading Steps */}
+            <div className="space-y-2 text-xs font-mono">
+              {[
+                'ESTABLISHING SECURE CHANNEL',
+                'LOADING AGENT DATABASE', 
+                'INITIALIZING VITAL MONITORS',
+                'ESTABLISHING QR TRACKING',
+                'FINALIZING SYSTEM ACCESS'
+              ].map((step, index) => (
+                <div key={index} className="flex justify-between items-center">
+                  <span className={`${index <= currentStep ? 'text-green-400' : 'text-gray-500'}`}>
+                    • {step}
+                  </span>
+                  <span className={`${index < currentStep ? 'text-green-500' : index === currentStep ? 'text-yellow-400 animate-pulse' : 'text-gray-500'}`}>
+                    {index < currentStep ? '✓' : index === currentStep ? '...' : '○'}
+                  </span>
+                </div>
+              ))}
+            </div>
+            
+            {/* System Info */}
+            <div className="mt-6 bg-black/50 rounded p-3 border border-green-500/20">
+              <div className="text-xs font-mono text-green-400 mb-2">SYSTEM INFORMATION</div>
+              <div className="space-y-1 text-xs font-mono text-gray-300">
+                <div className="flex justify-between">
+                  <span>CONNECTION:</span>
+                  <span className="text-green-400">SECURE</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>ENCRYPTION:</span>
+                  <span className="text-green-400">AES-256</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>ACCESS LEVEL:</span>
+                  <span className="text-red-400">CLASSIFIED</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Warning */}
+            <div className="mt-6 text-center">
+              <div className="text-red-400 text-xs font-mono animate-pulse">
+                ⚠️ UNAUTHORIZED ACCESS PROHIBITED ⚠️
+              </div>
+              <div className="text-gray-400 text-xs font-mono mt-1">
+                This system is monitored and logged
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-br from-red-900/10 via-black to-red-900/5"></div>
       
