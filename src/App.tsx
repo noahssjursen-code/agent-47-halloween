@@ -8,10 +8,12 @@ function App() {
   const [heartRate, setHeartRate] = useState(85)
   const [heartRateHistory, setHeartRateHistory] = useState([85, 87, 83, 89, 85])
   const [bloodPressure, setBloodPressure] = useState('120/80')
-  const [temperature, setTemperature] = useState('98.6°F')
+  const [temperature, setTemperature] = useState('37.0°C')
   const [oxygenSat, setOxygenSat] = useState('98%')
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleString())
   const [missionStatus, setMissionStatus] = useState('')
+  const [coverStatus, setCoverStatus] = useState('')
+  const [currentLocation, setCurrentLocation] = useState('')
 
   useEffect(() => {
     // Simulate loading time for government system initialization
@@ -52,16 +54,28 @@ function App() {
       
       if (dayOfWeek === 5) { // Friday
         setMissionStatus('RECONNAISSANCE')
-      } else if (dayOfWeek === 6 && hour >= 18) { // Saturday after 6 PM
+        setCoverStatus('CIVILIAN')
+        setCurrentLocation('UNKNOWN')
+      } else if ((dayOfWeek === 6 && hour >= 18) || (dayOfWeek === 0 && hour < 4)) { // Saturday after 6 PM OR Sunday before 4 AM
         setMissionStatus('BARTENDING')
+        setCoverStatus('BARTENDER')
+        setCurrentLocation('SJØHUSET')
       } else if (dayOfWeek === 6 && hour < 18) { // Saturday before 6 PM
         setMissionStatus('PREPARATION')
-      } else if (dayOfWeek === 0) { // Sunday
+        setCoverStatus('CIVILIAN')
+        setCurrentLocation('UNKNOWN')
+      } else if (dayOfWeek === 0 && hour >= 4) { // Sunday after 4 AM
         setMissionStatus('DEBRIEFING')
+        setCoverStatus('CIVILIAN')
+        setCurrentLocation('UNKNOWN')
       } else if (dayOfWeek >= 1 && dayOfWeek <= 4) { // Monday-Thursday
         setMissionStatus('TRAINING')
+        setCoverStatus('CIVILIAN')
+        setCurrentLocation('UNKNOWN')
       } else {
         setMissionStatus('STANDBY')
+        setCoverStatus('CIVILIAN')
+        setCurrentLocation('UNKNOWN')
       }
     }
     
@@ -90,9 +104,9 @@ function App() {
       const diastolic = Math.round(70 + Math.random() * 15)
       setBloodPressure(`${systolic}/${diastolic}`)
       
-      // Temperature simulation
-      const temp = (98.0 + Math.random() * 2).toFixed(1)
-      setTemperature(`${temp}°F`)
+      // Temperature simulation (Celsius)
+      const temp = (36.5 + Math.random() * 1.5).toFixed(1)
+      setTemperature(`${temp}°C`)
       
       // Oxygen saturation simulation
       const oxygen = Math.round(95 + Math.random() * 4)
@@ -108,6 +122,7 @@ function App() {
       clearInterval(vitalSignsInterval)
     }
   }, [])
+
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
@@ -293,127 +308,165 @@ function App() {
         </div>
 
         {/* Agent Dossier */}
-        <div className="text-center max-w-4xl mb-8">
-          <div className="bg-black/50 backdrop-blur-sm rounded-lg p-6 border border-red-500/30">
-            <h3 className="text-red-400 text-lg font-mono mb-6">AGENT DOSSIER</h3>
+        <div className="text-center max-w-6xl mb-8">
+          <div className="bg-gradient-to-br from-black/60 via-black/80 to-black/60 backdrop-blur-md rounded-xl p-6 md:p-8 border border-red-500/40 shadow-2xl">
+            <div className="flex items-center justify-center mb-8">
+              <h3 className="text-red-400 text-xl md:text-2xl font-mono font-bold tracking-wider">AGENT DOSSIER</h3>
+            </div>
             
             {/* Dossier Sections */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               
               {/* Basic Info Section */}
-              <div className="bg-black/30 rounded-lg p-4 border border-red-500/20">
-                <h4 className="text-red-400 text-sm font-mono mb-3">IDENTITY</h4>
-                <div className="space-y-2 text-left">
-                  <div>
+              <div className="bg-gradient-to-br from-black/40 to-black/60 rounded-lg p-4 md:p-5 border border-red-500/30 hover:border-red-500/50 transition-all duration-300">
+                <div className="flex items-center mb-4">
+                  <div className="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center mr-3">
+                    <div className="text-red-400 text-sm">👤</div>
+                  </div>
+                  <h4 className="text-red-400 text-sm md:text-base font-mono font-bold">IDENTITY</h4>
+                </div>
+                <div className="space-y-3 text-left">
+                  <div className="border-l-2 border-red-500/30 pl-3">
                     <p className="text-gray-400 text-xs font-mono">IDENTITY</p>
-                    <p className="text-white text-sm">Agent 47</p>
+                    <p className="text-white text-sm md:text-base font-semibold">Agent 47</p>
                   </div>
-                  <div>
+                  <div className="border-l-2 border-red-500/30 pl-3">
                     <p className="text-gray-400 text-xs font-mono">ALIAS</p>
-                    <p className="text-white text-sm">Noah</p>
+                    <p className="text-white text-sm md:text-base font-semibold">Noah</p>
                   </div>
-                  <div>
+                  <div className="border-l-2 border-red-500/30 pl-3">
                     <p className="text-gray-400 text-xs font-mono">AGE</p>
-                    <p className="text-white text-sm">21</p>
+                    <p className="text-white text-sm md:text-base font-semibold">21</p>
                   </div>
-                  <div>
+                  <div className="border-l-2 border-red-500/30 pl-3">
                     <p className="text-gray-400 text-xs font-mono">COVER</p>
-                    <p className="text-white text-sm">Bartender</p>
+                    <p className="text-white text-sm md:text-base font-semibold">{coverStatus}</p>
                   </div>
-                  <div>
+                  <div className="border-l-2 border-green-500/30 pl-3">
                     <p className="text-gray-400 text-xs font-mono">STATUS</p>
-                    <p className="text-green-400 text-sm">ALIVE</p>
+                    <p className="text-green-400 text-sm md:text-base font-semibold">ALIVE</p>
                   </div>
                 </div>
               </div>
 
               {/* Vital Signs Section */}
-              <div className="bg-black/30 rounded-lg p-4 border border-red-500/20">
-                <h4 className="text-red-400 text-sm font-mono mb-3">VITAL SIGNS</h4>
-                <div className="space-y-2 text-left">
-                  <div>
+              <div className="bg-gradient-to-br from-black/40 to-black/60 rounded-lg p-4 md:p-5 border border-red-500/30 hover:border-red-500/50 transition-all duration-300">
+                <div className="flex items-center mb-4">
+                  <div className="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center mr-3">
+                    <div className="text-red-400 text-sm">💓</div>
+                  </div>
+                  <h4 className="text-red-400 text-sm md:text-base font-mono font-bold">VITAL SIGNS</h4>
+                </div>
+                <div className="space-y-3 text-left">
+                  <div className="border-l-2 border-red-500/30 pl-3">
                     <p className="text-gray-400 text-xs font-mono">HEART RATE</p>
-                    <p className="text-red-400 text-sm font-mono">{heartRate} BPM</p>
+                    <p className="text-red-400 text-sm md:text-base font-mono font-bold">{heartRate} BPM</p>
                   </div>
-                  <div>
+                  <div className="border-l-2 border-red-500/30 pl-3">
                     <p className="text-gray-400 text-xs font-mono">BLOOD PRESSURE</p>
-                    <p className="text-red-400 text-sm font-mono">{bloodPressure}</p>
+                    <p className="text-red-400 text-sm md:text-base font-mono font-bold">{bloodPressure}</p>
                   </div>
-                  <div>
+                  <div className="border-l-2 border-red-500/30 pl-3">
                     <p className="text-gray-400 text-xs font-mono">TEMPERATURE</p>
-                    <p className="text-red-400 text-sm font-mono">{temperature}</p>
+                    <p className="text-red-400 text-sm md:text-base font-mono font-bold">{temperature}</p>
                   </div>
-                  <div>
+                  <div className="border-l-2 border-red-500/30 pl-3">
                     <p className="text-gray-400 text-xs font-mono">OXYGEN SAT</p>
-                    <p className="text-red-400 text-sm font-mono">{oxygenSat}</p>
+                    <p className="text-red-400 text-sm md:text-base font-mono font-bold">{oxygenSat}</p>
                   </div>
                 </div>
               </div>
 
               {/* Mission Details Section */}
-              <div className="bg-black/30 rounded-lg p-4 border border-red-500/20">
-                <h4 className="text-red-400 text-sm font-mono mb-3">MISSION STATUS</h4>
-                <div className="space-y-2 text-left">
-                  <div>
+              <div className="bg-gradient-to-br from-black/40 to-black/60 rounded-lg p-4 md:p-5 border border-red-500/30 hover:border-red-500/50 transition-all duration-300">
+                <div className="flex items-center mb-4">
+                  <div className="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center mr-3">
+                    <div className="text-red-400 text-sm">🎯</div>
+                  </div>
+                  <h4 className="text-red-400 text-sm md:text-base font-mono font-bold">MISSION STATUS</h4>
+                </div>
+                <div className="space-y-3 text-left">
+                  <div className="border-l-2 border-yellow-500/30 pl-3">
                     <p className="text-gray-400 text-xs font-mono">PHASE</p>
-                    <p className="text-yellow-400 text-sm font-mono">{missionStatus}</p>
+                    <p className="text-yellow-400 text-sm md:text-base font-mono font-bold">{missionStatus}</p>
                   </div>
-                  <div>
+                  <div className="border-l-2 border-red-500/30 pl-3">
                     <p className="text-gray-400 text-xs font-mono">CLEARANCE</p>
-                    <p className="text-white text-sm">CLASSIFIED</p>
+                    <p className="text-white text-sm md:text-base font-semibold">CLASSIFIED</p>
                   </div>
-                  <div>
+                  <div className="border-l-2 border-gray-500/30 pl-3">
                     <p className="text-gray-400 text-xs font-mono">LAST UPDATE</p>
-                    <p className="text-gray-300 text-xs font-mono">{currentTime}</p>
+                    <p className="text-gray-300 text-xs md:text-sm font-mono">{currentTime}</p>
                   </div>
-                  <div>
+                  <div className="border-l-2 border-blue-500/30 pl-3">
+                    <p className="text-gray-400 text-xs font-mono">CURRENT LOCATION</p>
+                    <p className="text-blue-400 text-sm md:text-base font-mono font-bold">{currentLocation}</p>
+                  </div>
+                  <div className="border-l-2 border-red-500/30 pl-3">
                     <p className="text-gray-400 text-xs font-mono">PRIORITY</p>
-                    <p className="text-red-400 text-sm">HIGH</p>
+                    <p className="text-red-400 text-sm md:text-base font-semibold">HIGH</p>
                   </div>
                 </div>
               </div>
 
               {/* Agent Statistics Section */}
-              <div className="bg-black/30 rounded-lg p-4 border border-red-500/20">
-                <h4 className="text-red-400 text-sm font-mono mb-3">AGENT STATISTICS</h4>
-                <div className="space-y-2 text-left">
-                  <div>
-                    <p className="text-gray-400 text-xs font-mono">MAIN TARGETS ELIMINATED</p>
-                    <p className="text-red-400 text-sm font-mono">39</p>
+              <div className="bg-gradient-to-br from-black/40 to-black/60 rounded-lg p-4 md:p-5 border border-red-500/30 hover:border-red-500/50 transition-all duration-300">
+                <div className="flex items-center mb-4">
+                  <div className="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center mr-3">
+                    <div className="text-red-400 text-sm">📊</div>
                   </div>
-                  <div>
-                    <p className="text-gray-400 text-xs font-mono">TOTAL TARGETS ELIMINATED</p>
-                    <p className="text-red-400 text-sm font-mono">876</p>
+                  <h4 className="text-red-400 text-sm md:text-base font-mono font-bold">STATISTICS</h4>
+                </div>
+                <div className="space-y-3 text-left">
+                  <div className="border-l-2 border-red-500/30 pl-3">
+                    <p className="text-gray-400 text-xs font-mono">MAIN TARGETS</p>
+                    <p className="text-red-400 text-sm md:text-base font-mono font-bold">39</p>
                   </div>
-                  <div>
+                  <div className="border-l-2 border-red-500/30 pl-3">
+                    <p className="text-gray-400 text-xs font-mono">TOTAL ELIMINATED</p>
+                    <p className="text-red-400 text-sm md:text-base font-mono font-bold">876</p>
+                  </div>
+                  <div className="border-l-2 border-green-500/30 pl-3">
                     <p className="text-gray-400 text-xs font-mono">MONEY EARNED</p>
-                    <p className="text-green-400 text-sm font-mono">$2,847,500</p>
+                    <p className="text-green-400 text-sm md:text-base font-mono font-bold">$2.8M</p>
                   </div>
-      <div>
+                  <div className="border-l-2 border-green-500/30 pl-3">
                     <p className="text-gray-400 text-xs font-mono">SUCCESS RATE</p>
-                    <p className="text-green-400 text-sm font-mono">98.4%</p>
+                    <p className="text-green-400 text-sm md:text-base font-mono font-bold">98.4%</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Notes Section */}
-            <div className="mt-6 bg-black/30 rounded-lg p-4 border border-red-500/20">
-              <h4 className="text-red-400 text-sm font-mono mb-3">NOTES</h4>
-              <div className="space-y-3 text-left">
-                <p className="text-gray-300 text-sm">
-                  <span className="text-red-400 font-mono">OPERATIVE PROFILE:</span> Highly skilled field agent with extensive combat experience and exceptional elimination capabilities. Maintains operational excellence across 39 primary targets and 876 total eliminations.
-                </p>
-                <p className="text-gray-300 text-sm">
-                  <span className="text-red-400 font-mono">CURRENT COVER:</span> Operating under bartender identity with expert-level mixology skills and superior customer service capabilities. Cover provides excellent access to target environments and maintains low-profile operational status.
-                </p>
-                <p className="text-gray-300 text-sm">
-                  <span className="text-red-400 font-mono">TECHNICAL STATUS:</span> QR code tracking system active. Real-time monitoring capabilities enabled. Mission parameters: High priority, classified clearance level.
-                </p>
+            <div className="mt-8 bg-gradient-to-r from-black/50 via-black/60 to-black/50 rounded-lg p-5 md:p-6 border border-red-500/30">
+              <div className="flex items-center mb-4">
+                <div className="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center mr-3">
+                  <div className="text-red-400 text-sm">📝</div>
+                </div>
+                <h4 className="text-red-400 text-sm md:text-base font-mono font-bold">INTELLIGENCE REPORT</h4>
+              </div>
+              <div className="space-y-4 text-left">
+                <div className="bg-black/30 rounded-lg p-4 border border-red-500/20">
+                  <p className="text-gray-300 text-sm md:text-base leading-relaxed">
+                    <span className="text-red-400 font-mono font-bold">OPERATIVE PROFILE:</span> Highly skilled field agent with extensive combat experience and exceptional elimination capabilities. Maintains operational excellence across 39 primary targets and 876 total eliminations.
+                  </p>
+                </div>
+                <div className="bg-black/30 rounded-lg p-4 border border-red-500/20">
+                  <p className="text-gray-300 text-sm md:text-base leading-relaxed">
+                    <span className="text-red-400 font-mono font-bold">CURRENT COVER:</span> Operating under bartender identity with expert-level mixology skills and superior customer service capabilities. Cover provides excellent access to target environments and maintains low-profile operational status.
+                  </p>
+                </div>
+                <div className="bg-black/30 rounded-lg p-4 border border-red-500/20">
+                  <p className="text-gray-300 text-sm md:text-base leading-relaxed">
+                    <span className="text-red-400 font-mono font-bold">TECHNICAL STATUS:</span> QR code tracking system active. Real-time monitoring capabilities enabled. Mission parameters: High priority, classified clearance level.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
       </div>
+
 
         {/* Status Bar */}
         <div className="text-center">
