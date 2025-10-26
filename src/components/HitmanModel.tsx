@@ -1,7 +1,23 @@
 import { Suspense, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { useGLTF, OrbitControls, Environment } from '@react-three/drei'
+import { useGLTF, OrbitControls, Environment, useTexture } from '@react-three/drei'
 import { Group } from 'three'
+
+// City Background Component
+function CityBackground() {
+  const texture = useTexture('/photos/citybackground.png')
+  
+  return (
+    <mesh position={[0, 0, -10]} rotation={[0, 0, 0]}>
+      <planeGeometry args={[20, 15]} />
+      <meshBasicMaterial 
+        map={texture}
+        transparent={true}
+        opacity={0.8}
+      />
+    </mesh>
+  )
+}
 
 function Model() {
   const { scene } = useGLTF('/models/hitman-model.glb')
@@ -28,10 +44,10 @@ function Model() {
 
 function HitmanModel() {
   return (
-    <div className="w-[28rem] h-[32rem] mx-auto">
+    <div className="w-full h-full mx-auto">
       <Canvas
         camera={{ position: [0, 0, 8], fov: 50 }}
-        style={{ background: 'transparent' }}
+        style={{ background: 'transparent', width: '100%', height: '100%' }}
       >
         <Suspense fallback={null}>
           {/* Ultra Maximum Lighting Setup */}
@@ -62,6 +78,9 @@ function HitmanModel() {
           
           {/* Environment */}
           <Environment preset="night" />
+          
+          {/* City Background Image */}
+          <CityBackground />
           
           {/* Model */}
           <Model />
