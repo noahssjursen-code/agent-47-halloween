@@ -114,39 +114,39 @@ function App() {
       {/* Government Loading Overlay */}
       {isLoading && (
         <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-          <div className="bg-black/90 border border-green-500/50 rounded-lg p-8 max-w-md w-full mx-4">
+          <div className="bg-black/90 border border-green-500/50 rounded-lg p-6 md:p-8 max-w-sm md:max-w-lg w-full mx-4">
             {/* Government Header */}
             <div className="text-center mb-6">
-              <div className="text-green-400 text-lg font-mono font-bold mb-2 animate-pulse">
+              <div className="text-green-400 text-base md:text-lg font-mono font-bold mb-2 animate-pulse">
                 CLASSIFIED GOVERNMENT SYSTEM
               </div>
-              <div className="text-green-500 text-sm font-mono">
+              <div className="text-green-500 text-sm md:text-base font-mono">
                 INITIALIZING SECURE CONNECTION...
               </div>
-              <div className="text-gray-400 text-xs font-mono mt-1">
+              <div className="text-gray-400 text-xs md:text-sm font-mono mt-1">
                 {new Date().toLocaleString()}
               </div>
             </div>
             
             {/* Loading Progress */}
             <div className="mb-6">
-              <div className="flex justify-between text-xs text-green-400 font-mono mb-2">
+              <div className="flex justify-between text-xs md:text-sm text-green-400 font-mono mb-2">
                 <span>SYSTEM STATUS</span>
                 <span className="animate-pulse">{Math.round(loadingProgress)}%</span>
               </div>
-              <div className="w-full bg-black border border-green-500/30 rounded-full h-3 overflow-hidden">
+              <div className="w-full bg-black border border-green-500/30 rounded-full h-2 md:h-3 overflow-hidden">
                 <div 
-                  className="bg-gradient-to-r from-green-500 to-green-400 h-3 rounded-full transition-all duration-300 ease-out"
+                  className="bg-gradient-to-r from-green-500 to-green-400 h-2 md:h-3 rounded-full transition-all duration-300 ease-out"
                   style={{width: `${loadingProgress}%`}}
                 ></div>
               </div>
-              <div className="text-center text-xs text-green-400 font-mono mt-1">
+              <div className="text-center text-xs md:text-sm text-green-400 font-mono mt-1">
                 {loadingProgress < 100 ? 'INITIALIZING...' : 'ACCESS GRANTED'}
               </div>
             </div>
             
             {/* Loading Steps */}
-            <div className="space-y-2 text-xs font-mono">
+            <div className="space-y-2 text-xs md:text-sm font-mono">
               {[
                 'ESTABLISHING SECURE CHANNEL',
                 'LOADING AGENT DATABASE', 
@@ -166,9 +166,9 @@ function App() {
             </div>
             
             {/* System Info */}
-            <div className="mt-6 bg-black/50 rounded p-3 border border-green-500/20">
-              <div className="text-xs font-mono text-green-400 mb-2">SYSTEM INFORMATION</div>
-              <div className="space-y-1 text-xs font-mono text-gray-300">
+            <div className="mt-6 bg-black/50 rounded p-3 md:p-4 border border-green-500/20">
+              <div className="text-xs md:text-sm font-mono text-green-400 mb-2">SYSTEM INFORMATION</div>
+              <div className="space-y-1 text-xs md:text-sm font-mono text-gray-300">
                 <div className="flex justify-between">
                   <span>CONNECTION:</span>
                   <span className="text-green-400">SECURE</span>
@@ -186,7 +186,7 @@ function App() {
             
             {/* Warning */}
             <div className="mt-6 text-center">
-              <div className="text-red-400 text-xs font-mono animate-pulse">
+              <div className="text-red-400 text-xs md:text-sm font-mono animate-pulse">
                 ⚠️ UNAUTHORIZED ACCESS PROHIBITED ⚠️
               </div>
               <div className="text-gray-400 text-xs font-mono mt-1">
@@ -219,7 +219,7 @@ function App() {
         
 
         {/* Full Hero Section with Model */}
-        <div className="relative w-full h-[80vh] mb-8">
+        <div className="relative w-full max-w-4xl mx-auto h-[70vh] md:h-[80vh] mb-8">
           {/* 3D Model Container */}
           <div className="absolute inset-0 bg-gradient-to-b from-slate-800/50 to-slate-900/50 rounded-2xl shadow-2xl border border-red-500/20 backdrop-blur-sm">
             <HitmanModel />
@@ -240,7 +240,7 @@ function App() {
           </div>
           
           {/* Heart Rate Monitor Overlay */}
-          <div className="absolute bottom-4 left-4 right-4 bg-black/95 backdrop-blur-sm rounded-lg p-3 border-2 border-red-500/60 z-20 shadow-lg">
+          <div className="absolute bottom-4 left-4 right-4 max-w-2xl mx-auto bg-black/95 backdrop-blur-sm rounded-lg p-3 border-2 border-red-500/60 z-20 shadow-lg">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-2">
                 <div className="text-red-500 text-xl animate-pulse">❤️</div>
