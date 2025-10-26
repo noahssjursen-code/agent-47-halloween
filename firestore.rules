@@ -1,0 +1,23 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow read access to agent status for public viewing
+    match /agent/status {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Allow read/write access to photos collection for public photo uploads
+    match /photos/{photoId} {
+      allow read: if true;
+      allow create: if true; // Anyone can upload photos
+      allow update, delete: if request.auth != null; // Only authenticated users can modify/delete
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

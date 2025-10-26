@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react'
+import { Routes, Route } from 'react-router-dom'
 import HitmanModel from './components/HitmanModel'
+import SignInModal from './components/SignInModal'
+import AdminPage from './pages/AdminPage'
+import PhotoGallery from './pages/PhotoGallery'
+import { db } from './config/firebase'
+import { doc, onSnapshot } from 'firebase/firestore'
 
 function App() {
   const [isLoading, setIsLoading] = useState(true)
@@ -14,6 +20,10 @@ function App() {
   const [missionStatus, setMissionStatus] = useState('')
   const [coverStatus, setCoverStatus] = useState('')
   const [currentLocation, setCurrentLocation] = useState('')
+  const [intelligenceReport, setIntelligenceReport] = useState('')
+  const [alcoholConsumed, setAlcoholConsumed] = useState(0)
+  const [showSignIn, setShowSignIn] = useState(false)
+  const [firestoreAlcoholCount, setFirestoreAlcoholCount] = useState(0)
 
   useEffect(() => {
     // Simulate loading time for government system initialization
@@ -55,27 +65,57 @@ function App() {
       if (dayOfWeek === 5) { // Friday
         setMissionStatus('RECONNAISSANCE')
         setCoverStatus('CIVILIAN')
-        setCurrentLocation('UNKNOWN')
+        setCurrentLocation('HAUGESUND')
+        setIntelligenceReport(`OPERATIVE PROFILE: Highly skilled field agent with extensive combat experience and exceptional elimination capabilities. Maintains operational excellence across 39 primary targets and 876 total eliminations.
+
+CURRENT COVER: Operating under civilian identity for reconnaissance phase. Gathering intelligence on target locations and establishing surveillance patterns in high-activity environment.
+
+TECHNICAL STATUS: QR code tracking system active. Real-time monitoring capabilities enabled. Mission parameters: High priority, classified clearance level.`)
       } else if ((dayOfWeek === 6 && hour >= 18) || (dayOfWeek === 0 && hour < 4)) { // Saturday after 6 PM OR Sunday before 4 AM
         setMissionStatus('BARTENDING')
         setCoverStatus('BARTENDER')
         setCurrentLocation('SJØHUSET')
+        setIntelligenceReport(`OPERATIVE PROFILE: Highly skilled field agent with extensive combat experience and exceptional elimination capabilities. Maintains operational excellence across 39 primary targets and 876 total eliminations.
+
+CURRENT COVER: Operating under bartender identity with expert-level mixology skills and superior customer service capabilities. Cover provides excellent access to target environments and maintains low-profile operational status.
+
+TECHNICAL STATUS: QR code tracking system active. Real-time monitoring capabilities enabled. Mission parameters: High priority, classified clearance level.`)
       } else if (dayOfWeek === 6 && hour < 18) { // Saturday before 6 PM
         setMissionStatus('PREPARATION')
         setCoverStatus('CIVILIAN')
         setCurrentLocation('UNKNOWN')
+        setIntelligenceReport(`OPERATIVE PROFILE: Highly skilled field agent with extensive combat experience and exceptional elimination capabilities. Maintains operational excellence across 39 primary targets and 876 total eliminations.
+
+CURRENT COVER: Operating under civilian identity for mission preparation phase. Finalizing operational parameters and establishing cover identity protocols.
+
+TECHNICAL STATUS: QR code tracking system active. Real-time monitoring capabilities enabled. Mission parameters: High priority, classified clearance level.`)
       } else if (dayOfWeek === 0 && hour >= 4) { // Sunday after 4 AM
         setMissionStatus('DEBRIEFING')
         setCoverStatus('CIVILIAN')
         setCurrentLocation('UNKNOWN')
+        setIntelligenceReport(`OPERATIVE PROFILE: Highly skilled field agent with extensive combat experience and exceptional elimination capabilities. Maintains operational excellence across 39 primary targets and 876 total eliminations.
+
+CURRENT COVER: Operating under civilian identity for mission debriefing phase. Compiling operational reports and analyzing mission outcomes.
+
+TECHNICAL STATUS: QR code tracking system active. Real-time monitoring capabilities enabled. Mission parameters: High priority, classified clearance level.`)
       } else if (dayOfWeek >= 1 && dayOfWeek <= 4) { // Monday-Thursday
         setMissionStatus('TRAINING')
         setCoverStatus('CIVILIAN')
         setCurrentLocation('UNKNOWN')
+        setIntelligenceReport(`OPERATIVE PROFILE: Highly skilled field agent with extensive combat experience and exceptional elimination capabilities. Maintains operational excellence across 39 primary targets and 876 total eliminations.
+
+CURRENT COVER: Operating under civilian identity for training phase. Maintaining operational readiness and skill refinement protocols.
+
+TECHNICAL STATUS: QR code tracking system active. Real-time monitoring capabilities enabled. Mission parameters: High priority, classified clearance level.`)
       } else {
         setMissionStatus('STANDBY')
         setCoverStatus('CIVILIAN')
         setCurrentLocation('UNKNOWN')
+        setIntelligenceReport(`OPERATIVE PROFILE: Highly skilled field agent with extensive combat experience and exceptional elimination capabilities. Maintains operational excellence across 39 primary targets and 876 total eliminations.
+
+CURRENT COVER: Operating under civilian identity for standby phase. Maintaining operational readiness and awaiting mission parameters.
+
+TECHNICAL STATUS: QR code tracking system active. Real-time monitoring capabilities enabled. Mission parameters: High priority, classified clearance level.`)
       }
     }
     
@@ -84,6 +124,14 @@ function App() {
     
     // Update status every hour (not every 3 seconds)
     const statusInterval = setInterval(updateMissionStatus, 3600000) // 1 hour
+    
+    // Listen to Firestore alcohol count changes
+    const unsubscribe = onSnapshot(doc(db, 'agent', 'status'), (doc) => {
+      if (doc.exists()) {
+        const data = doc.data()
+        setFirestoreAlcoholCount(data.alcoholConsumed || 0)
+      }
+    })
     
     // Vital signs simulation
     const vitalSignsInterval = setInterval(() => {
@@ -120,12 +168,17 @@ function App() {
       clearInterval(progressInterval)
       clearInterval(statusInterval)
       clearInterval(vitalSignsInterval)
+      unsubscribe() // Clean up Firestore listener
     }
   }, [])
 
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden">
+    <Routes>
+      <Route path="/admin" element={<AdminPage />} />
+      <Route path="/photos" element={<PhotoGallery />} />
+      <Route path="/" element={
+        <div className="min-h-screen bg-black relative overflow-hidden">
       {/* Government Loading Overlay */}
       {isLoading && (
         <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
@@ -303,8 +356,17 @@ function App() {
           </div>
         </div>
 
-        {/* Interactive Elements */}
-        <div className="flex justify-center mb-8">
+        {/* Photo Gallery Button - Above Dossier */}
+        <div className="text-center mb-8">
+          <button 
+            onClick={() => window.location.href = '/photos'}
+            className="bg-red-600 hover:bg-red-700 text-white font-mono px-8 py-4 rounded-lg transition-all duration-200 text-lg font-bold shadow-lg hover:shadow-red-500/25"
+          >
+            📸 PHOTO GALLERY
+          </button>
+          <p className="text-gray-400 text-sm font-mono mt-2">
+            Submit your mission evidence
+          </p>
         </div>
 
         {/* Agent Dossier */}
@@ -436,6 +498,38 @@ function App() {
                   </div>
                 </div>
               </div>
+
+              {/* Alcohol Consumption Section */}
+              <div className="bg-gradient-to-br from-black/30 to-black/50 rounded-lg p-4 md:p-5 border border-red-500/20 hover:border-red-500/50 transition-all duration-300">
+                <div className="flex items-center mb-4">
+                  <div className="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center mr-3">
+                    <div className="text-red-400 text-sm">🍺</div>
+                  </div>
+                  <h4 className="text-red-400 text-sm md:text-base font-mono font-bold">ALCOHOL CONSUMPTION</h4>
+                </div>
+                <div className="space-y-3 text-left">
+                  <div className="border-l-2 border-yellow-500/30 pl-3">
+                    <p className="text-gray-400 text-xs font-mono">DRINKS CONSUMED</p>
+                    <p className="text-yellow-400 text-sm md:text-base font-mono font-bold">{firestoreAlcoholCount}</p>
+                  </div>
+                  <div className="border-l-2 border-yellow-500/30 pl-3">
+                    <p className="text-gray-400 text-xs font-mono">BAC ESTIMATE</p>
+                    <p className="text-yellow-400 text-sm md:text-base font-mono font-bold">{((firestoreAlcoholCount * 12.8) / (77 * 1000) * 100).toFixed(3)}%</p>
+                  </div>
+                  <div className="border-l-2 border-red-500/30 pl-3">
+                    <p className="text-gray-400 text-xs font-mono">STATUS</p>
+                    <p className={`text-sm md:text-base font-mono font-bold ${
+                      firestoreAlcoholCount === 0 ? 'text-green-400' : 
+                      firestoreAlcoholCount <= 3 ? 'text-yellow-400' : 
+                      firestoreAlcoholCount <= 6 ? 'text-orange-400' : 'text-red-400'
+                    }`}>
+                      {firestoreAlcoholCount === 0 ? 'SOBER' : 
+                       firestoreAlcoholCount <= 3 ? 'TIPSY' : 
+                       firestoreAlcoholCount <= 6 ? 'BUZZED' : 'WASTED'}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Notes Section */}
@@ -448,19 +542,36 @@ function App() {
               </div>
               <div className="space-y-4 text-left">
                 <div className="bg-black/30 rounded-lg p-4 border border-red-500/20">
-                  <p className="text-gray-300 text-sm md:text-base leading-relaxed">
-                    <span className="text-red-400 font-mono font-bold">OPERATIVE PROFILE:</span> Highly skilled field agent with extensive combat experience and exceptional elimination capabilities. Maintains operational excellence across 39 primary targets and 876 total eliminations.
-                  </p>
-                </div>
-                <div className="bg-black/30 rounded-lg p-4 border border-red-500/20">
-                  <p className="text-gray-300 text-sm md:text-base leading-relaxed">
-                    <span className="text-red-400 font-mono font-bold">CURRENT COVER:</span> Operating under bartender identity with expert-level mixology skills and superior customer service capabilities. Cover provides excellent access to target environments and maintains low-profile operational status.
-                  </p>
-                </div>
-                <div className="bg-black/30 rounded-lg p-4 border border-red-500/20">
-                  <p className="text-gray-300 text-sm md:text-base leading-relaxed">
-                    <span className="text-red-400 font-mono font-bold">TECHNICAL STATUS:</span> QR code tracking system active. Real-time monitoring capabilities enabled. Mission parameters: High priority, classified clearance level.
-                  </p>
+                  <div className="text-gray-300 text-sm md:text-base leading-relaxed whitespace-pre-line">
+                    {intelligenceReport.split('\n').map((line, index) => {
+                      if (line.startsWith('OPERATIVE PROFILE:')) {
+                        return (
+                          <div key={index} className="mb-3">
+                            <span className="text-red-400 font-mono font-bold">OPERATIVE PROFILE:</span>
+                            <span className="text-gray-300">{line.replace('OPERATIVE PROFILE:', '')}</span>
+                          </div>
+                        )
+                      } else if (line.startsWith('CURRENT COVER:')) {
+                        return (
+                          <div key={index} className="mb-3">
+                            <span className="text-red-400 font-mono font-bold">CURRENT COVER:</span>
+                            <span className="text-gray-300">{line.replace('CURRENT COVER:', '')}</span>
+                          </div>
+                        )
+                      } else if (line.startsWith('TECHNICAL STATUS:')) {
+                        return (
+                          <div key={index} className="mb-3">
+                            <span className="text-red-400 font-mono font-bold">TECHNICAL STATUS:</span>
+                            <span className="text-gray-300">{line.replace('TECHNICAL STATUS:', '')}</span>
+                          </div>
+                        )
+                      } else if (line.trim() === '') {
+                        return <br key={index} />
+                      } else {
+                        return <div key={index} className="text-gray-300">{line}</div>
+                      }
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
@@ -469,7 +580,7 @@ function App() {
 
 
         {/* Status Bar */}
-        <div className="text-center">
+        <div className="text-center mb-8">
           <div className="bg-black/50 backdrop-blur-sm rounded-lg px-6 py-3 border border-red-500/30">
             <p className="text-red-400 text-sm font-mono tracking-wider">
               MISSION STATUS: ACTIVE
@@ -480,8 +591,25 @@ function App() {
           </div>
         </div>
 
+        {/* Admin Sign In Footer */}
+        <div className="text-center py-4">
+          <button 
+            onClick={() => setShowSignIn(true)}
+            className="text-gray-500 text-xs font-mono hover:text-red-400 transition-colors duration-200"
+          >
+            ADMIN ACCESS
+        </button>
+        </div>
+
       </div>
-    </div>
+
+      {/* Sign In Modal */}
+      {showSignIn && (
+        <SignInModal onClose={() => setShowSignIn(false)} />
+      )}
+        </div>
+      } />
+    </Routes>
   )
 }
 
