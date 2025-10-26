@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { signInWithEmailAndPassword } from 'firebase/auth'
-import { auth, db } from '../config/firebase'
-import { doc, updateDoc } from 'firebase/firestore'
+import { auth } from '../config/firebase'
 import { useNavigate } from 'react-router-dom'
 
 interface SignInModalProps {

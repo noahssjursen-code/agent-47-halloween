@@ -21,7 +21,6 @@ function App() {
   const [coverStatus, setCoverStatus] = useState('')
   const [currentLocation, setCurrentLocation] = useState('')
   const [intelligenceReport, setIntelligenceReport] = useState('')
-  const [alcoholConsumed, setAlcoholConsumed] = useState(0)
   const [showSignIn, setShowSignIn] = useState(false)
   const [firestoreAlcoholCount, setFirestoreAlcoholCount] = useState(0)
 
