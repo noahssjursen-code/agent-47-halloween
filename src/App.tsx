@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import HitmanModel from './components/HitmanModel'
 
 function App() {
-  const [isLoaded, setIsLoaded] = useState(false)
   const [heartRate, setHeartRate] = useState(85)
   const [heartRateHistory, setHeartRateHistory] = useState([85, 87, 83, 89, 85])
   const [bloodPressure, setBloodPressure] = useState('120/80')
@@ -12,8 +11,6 @@ function App() {
   const [missionStatus, setMissionStatus] = useState('')
 
   useEffect(() => {
-    setIsLoaded(true)
-    
     // Set mission status based on day/time
     const updateMissionStatus = () => {
       const now = new Date()
