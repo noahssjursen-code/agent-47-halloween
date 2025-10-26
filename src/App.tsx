@@ -4,8 +4,6 @@ import HitmanModel from './components/HitmanModel'
 import SignInModal from './components/SignInModal'
 import AdminPage from './pages/AdminPage'
 import PhotoGallery from './pages/PhotoGallery'
-import { db } from './config/firebase'
-import { doc, onSnapshot } from 'firebase/firestore'
 
 function App() {
   const [isLoading, setIsLoading] = useState(true)
@@ -22,7 +20,6 @@ function App() {
   const [currentLocation, setCurrentLocation] = useState('')
   const [intelligenceReport, setIntelligenceReport] = useState('')
   const [showSignIn, setShowSignIn] = useState(false)
-  const [firestoreAlcoholCount, setFirestoreAlcoholCount] = useState(0)
 
   useEffect(() => {
     // Simulate loading time for government system initialization
@@ -124,14 +121,6 @@ TECHNICAL STATUS: QR code tracking system active. Real-time monitoring capabilit
     // Update status every hour (not every 3 seconds)
     const statusInterval = setInterval(updateMissionStatus, 3600000) // 1 hour
     
-    // Listen to Firestore alcohol count changes
-    const unsubscribe = onSnapshot(doc(db, 'agent', 'status'), (doc) => {
-      if (doc.exists()) {
-        const data = doc.data()
-        setFirestoreAlcoholCount(data.alcoholConsumed || 0)
-      }
-    })
-    
     // Vital signs simulation
     const vitalSignsInterval = setInterval(() => {
       // Heart rate simulation
@@ -167,7 +156,6 @@ TECHNICAL STATUS: QR code tracking system active. Real-time monitoring capabilit
       clearInterval(progressInterval)
       clearInterval(statusInterval)
       clearInterval(vitalSignsInterval)
-      unsubscribe() // Clean up Firestore listener
     }
   }, [])
 
@@ -494,38 +482,6 @@ TECHNICAL STATUS: QR code tracking system active. Real-time monitoring capabilit
                   <div className="border-l-2 border-green-500/30 pl-3">
                     <p className="text-gray-400 text-xs font-mono">SUCCESS RATE</p>
                     <p className="text-green-400 text-sm md:text-base font-mono font-bold">98.4%</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Alcohol Consumption Section */}
-              <div className="bg-gradient-to-br from-black/30 to-black/50 rounded-lg p-4 md:p-5 border border-red-500/20 hover:border-red-500/50 transition-all duration-300">
-                <div className="flex items-center mb-4">
-                  <div className="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center mr-3">
-                    <div className="text-red-400 text-sm">🍺</div>
-                  </div>
-                  <h4 className="text-red-400 text-sm md:text-base font-mono font-bold">ALCOHOL CONSUMPTION</h4>
-                </div>
-                <div className="space-y-3 text-left">
-                  <div className="border-l-2 border-yellow-500/30 pl-3">
-                    <p className="text-gray-400 text-xs font-mono">DRINKS CONSUMED</p>
-                    <p className="text-yellow-400 text-sm md:text-base font-mono font-bold">{firestoreAlcoholCount}</p>
-                  </div>
-                  <div className="border-l-2 border-yellow-500/30 pl-3">
-                    <p className="text-gray-400 text-xs font-mono">BAC ESTIMATE</p>
-                    <p className="text-yellow-400 text-sm md:text-base font-mono font-bold">{((firestoreAlcoholCount * 12.8) / (77 * 1000) * 100).toFixed(3)}%</p>
-                  </div>
-                  <div className="border-l-2 border-red-500/30 pl-3">
-                    <p className="text-gray-400 text-xs font-mono">STATUS</p>
-                    <p className={`text-sm md:text-base font-mono font-bold ${
-                      firestoreAlcoholCount === 0 ? 'text-green-400' : 
-                      firestoreAlcoholCount <= 3 ? 'text-yellow-400' : 
-                      firestoreAlcoholCount <= 6 ? 'text-orange-400' : 'text-red-400'
-                    }`}>
-                      {firestoreAlcoholCount === 0 ? 'SOBER' : 
-                       firestoreAlcoholCount <= 3 ? 'TIPSY' : 
-                       firestoreAlcoholCount <= 6 ? 'BUZZED' : 'WASTED'}
-                    </p>
                   </div>
                 </div>
               </div>
